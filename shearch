@@ -1,0 +1,91 @@
+#!/bin/bash
+#
+# Copyright (C) 2019 Marios Tsolekas <marios.tsolekas@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+show_help() {
+    cat <<EOH
+Usage: shearch [OPTION]
+GNU Find frontend using YAD
+
+Available options are
+  -h        print this message
+  -d DIR    specify start directory for find. Default is $HOME
+  -l N      limit the number of results. Default is 500
+EOH
+}
+
+DIRECTORY="$HOME"
+LIMIT=500
+
+EXE="${0##*/}"
+
+while getopts ":hd:l:" opt; do
+    case $opt in
+        h)
+            show_help >&2
+            exit 0
+            ;;
+        l)
+            if ((OPTARG > 0)); then
+                ((LIMIT = OPTARG))
+            else
+                echo "$EXE: option requires positive integer -- l" >&2
+                exit 1
+            fi
+            ;;
+        d)
+            if [[ -d $OPTARG ]]; then
+                DIRECTORY="$OPTARG"
+            else
+                echo "$EXE: directory does not exist -- d $OPTARG" >&2
+                exit 1
+            fi
+            ;;
+        :)
+            echo "$EXE: option requires an argument -- $OPTARG" >&2
+            exit 1
+            ;;
+        \?)
+            echo "$EXE: illegal option -- $OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
+shift "$((OPTIND - 1))"
+if [[ -n $1 ]]; then
+    echo "$EXE: too many arguments" >&2
+    exit 1
+fi
+
+term=$(yad --entry --title=Search)
+if [[ -z $term ]]; then
+    exit 1
+fi
+
+IFS=$'\n' results=( $(find "$DIRECTORY" -iname "*$term*" 2>/dev/null \
+                          | head -n "$LIMIT" | sort -fg) )
+
+sel=$(yad --list --title=Search --width=600 --height=600 \
+          --column=Path "${results[@]}" 2>/dev/null)
+if [[ $sel =~ .*\|$ ]]; then
+    sel=${sel::-1}
+fi
+
+if [[ -n $sel ]] && [[ -e $sel ]]; then
+    xdg-open "$sel"
+fi

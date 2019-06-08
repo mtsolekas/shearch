@@ -1,0 +1,46 @@
+.TH man 1 "June 2019" "1.0" "shearch man page"
+
+.SH NAME
+shearch \- GNU Find frontend using YAD
+
+.SH SYNOPSIS
+.B shearch [OPTION]
+
+.SH DESCRIPTION
+shearch is a simple wrapper around find providing a GTK interface
+to search with and open applications. The number of results and the
+starting directory can be changed from the defaults using the options
+below.
+
+It can easily be integrated with file managers such as Thunar, by using
+custom actions or the equivalent of your file manager.
+
+.SH OPTIONS
+
+.TP
+.B \-h
+print usage information and exit
+
+.TP
+.B \-d DIR
+specify the directory from which to start searching. Default is $HOME
+
+.TP
+.B \-l N
+limit the number of results displayed. Default is 500
+
+.SH SEE ALSO
+find(1), yad(1), xdg-open(1)
+
+.SH AUTHOR
+Marios Tsolekas <marios.tsolekas@gmail.com>
+
+.SH REPORTING BUGS
+Report bugs to <https://github.com/mtsolekas/shearch/issues>
+
+.SH COPYRIGHT
+This program is free software. You can redistribute it and/or modify
+it under the terms of the GNU GPL version 3 or (at your option)
+any later version. There is NO warranty, not even MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.
+See http://gnu.org/licenses/gpl.html
