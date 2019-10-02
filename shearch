@@ -77,8 +77,8 @@ if [[ -z $term ]]; then
     exit 1
 fi
 
-IFS=$'\n' results=( $(find "$DIRECTORY" -iname "*$term*" 2>/dev/null \
-                          | head -n "$LIMIT" | sort -fg) )
+mapfile -t results < <(find "$DIRECTORY" -iname "*$term*" 2>/dev/null \
+                           | head -n "$LIMIT" | sort -fg)
 
 sel=$(yad --list --title=Search --width=600 --height=600 \
           --column=Path "${results[@]}" 2>/dev/null)
