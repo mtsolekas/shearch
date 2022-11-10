@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2019 Marios Tsolekas <marios.tsolekas@gmail.com>
+# Copyright (C) 2019,2022 Marios Tsolekas <marios.tsolekas@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,19 +25,35 @@ Available options are
   -h        print this message
   -d DIR    specify start directory for find. Default is $HOME
   -l N      limit the number of results. Default is 500
+  -e        use locate instead of find. Take care to have an updated locate.db
+  -s TERM   provide the search term here instead of prompting for it
+  -v        print version
 EOH
 }
 
+VERSION="1.1.0"
 DIRECTORY="$HOME"
 LIMIT=500
+ENGINE="find"
+TERM=""
 
 EXE="${0##*/}"
 
-while getopts ":hd:l:" opt; do
+while getopts ":vhed:l:s:" opt; do
     case $opt in
         h)
             show_help >&2
             exit 0
+            ;;
+        v)
+            echo "$VERSION"
+            exit 0
+            ;;
+        e)
+            ENGINE="locate"
+            ;;
+        s)
+            TERM="$OPTARG"
             ;;
         l)
             if ((OPTARG > 0)); then
@@ -72,13 +88,20 @@ if [[ -n $1 ]]; then
     exit 1
 fi
 
-term=$(yad --entry --title=Search)
-if [[ -z $term ]]; then
-    exit 1
+if [[ -z $TERM ]]; then
+    TERM=$(yad --entry --title=Search)
+    if [[ -z $TERM ]]; then
+        exit 1
+    fi
 fi
 
-mapfile -t results < <(find "$DIRECTORY" -iname "*$term*" 2>/dev/null \
-                           | head -n "$LIMIT" | sort -fg)
+if [[ $ENGINE = "find" ]]; then
+    mapfile -t results < <(find "$DIRECTORY" -iname "*$TERM*" 2>/dev/null \
+                               | head -n "$LIMIT" | sort -fg)
+elif [[ $ENGINE = "locate" ]]; then
+    mapfile -t results < <(locate -bi "*$TERM*" 2>/dev/null | grep "^$DIRECTORY*" \
+                               | head -n "$LIMIT" | sort -fg)
+fi
 
 sel=$(yad --list --title=Search --width=600 --height=600 \
           --column=Path "${results[@]}" 2>/dev/null)

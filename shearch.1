@@ -1,4 +1,4 @@
-.TH man 1 "June 2019" "1.0" "shearch man page"
+.TH man 1 "November 2022" "1.1.0" "shearch man page"
 
 .SH NAME
 shearch \- GNU Find frontend using YAD
@@ -20,6 +20,10 @@ custom actions or the equivalent of your file manager.
 .TP
 .B \-h
 print usage information and exit
+.TP
+
+.B \-v
+print version
 
 .TP
 .B \-d DIR
@@ -29,8 +33,16 @@ specify the directory from which to start searching. Default is $HOME
 .B \-l N
 limit the number of results displayed. Default is 500
 
+.TP
+.B \-s TERM
+provide the search term here instead of prompting for it
+
+.TP
+.B \-e
+use locate instead of find. Take care to have an updated locate.db
+
 .SH SEE ALSO
-find(1), yad(1), xdg-open(1)
+find(1), locate(1), yad(1), xdg-open(1)
 
 .SH AUTHOR
 Marios Tsolekas <marios.tsolekas@gmail.com>
